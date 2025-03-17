@@ -13,7 +13,7 @@ if [ "$1" == "admin" ]; then
     allure serve admin_portal/testresult/allure-results
 elif [ "$1" == "snapper" ]; then
     echo "Running pytest for snapper portal"
-    clean_allure_cache "admin_portal/testresult/allure-results"
+    clean_allure_cache "snapper_portal/testresult/allure-results"
     pytest snapper_portal/tests --alluredir=snapper_portal/testresult/allure-results --maxfail=1 --disable-warnings -q
     allure serve snapper_portal/testresult/allure-results
 else

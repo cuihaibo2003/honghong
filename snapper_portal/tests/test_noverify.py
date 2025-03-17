@@ -34,6 +34,10 @@ def test_open_website(browser_context):
             page.goto("https://me-dev-1.snapsendsolve.com/snap", timeout=10000)
 
         # Steps2: Add photos screen testing
+        # Steps2.1: Check the after photo screen UI before uploading the photos
+        with allure.step("Check the text on the after photo screen"):
+            assert page.locator("text=Help Solvers locate your issue").is_visible(), "Error-No copy is found: Help Solvers locate your issue"
+            assert page.locator("text=Add close-ups to show details and wider shots to capture landmarks like buildings or street signs.").is_visible(), "Error-No copy is found: Add close-ups..."
  
         with allure.step("Upload photos on the add photo screen"):
             # Wait for the file chooser
@@ -81,21 +85,39 @@ def test_open_website(browser_context):
          # Incident type list page
         with allure.step("Incident type list page"):   
             page.locator("a").filter(has_text="Test blur Snap Send Solve").click()
-            page.get_by_placeholder("No swear words, please — a").click()
-            page.get_by_placeholder("No swear words, please — a").fill("test")
+        with allure.step("Incident details page"):
+            
+            Details_placeholder = page.locator(".snapper-details__textarea").get_attribute("placeholder") 
+            expected_placeholder = "Avoid adding personal details in this description. And keep it respectful, no swearing please." 
+            assert Details_placeholder == expected_placeholder, f"Details placeholder text is incorrect. Found: {Details_placeholder}, Expected: {expected_placeholder}"     
+            
+            page.locator(".snapper-details__textarea").click()
+            page.locator(".snapper-details__textarea").fill("test")
             page.get_by_role("button", name="Next").click()
             
             
             
         with allure.step("Your details screen"):    
-            page.get_by_placeholder("First name").click()
-            page.get_by_placeholder("First name").fill("test")
-            page.get_by_placeholder("Last name").click()
-            page.get_by_placeholder("Last name").fill("test")
-            page.get_by_placeholder("Email address").click()
-            page.get_by_placeholder("Email address").fill("haibo.cui@snapsendsolve.com")
+    
+            page.locator("input[name='firstName']").fill("test")
+            page.locator("input[name='lastName']").fill("test")
+            page.locator("input[name='email']").fill("haibo.cui@snapsendsolve.com")
             page.get_by_role("button", name="Next").click()
-            page.get_by_role("button", name="Send").click()
+            
+        with allure.step("Confirm details screen"):   
+            
+            confirm_title = page.locator(".snapper__main-title").inner_text()
+            assert confirm_title == "Confirm details", f"Title mismatch: {confirm_title}"
+    
+            page.locator("button", has_text="Send").click()
+            
+        with allure.step(f"Send screen"):
+            # check url
+            page.wait_for_load_state("networkidle")
+            page.wait_for_url('**/snap-sent', timeout=10000)
+            current_url = page.url
+            assert page.url.endswith("/snap-sent"), f"URL mismatch: {current_url}"
+            
 
     except Exception as e:
         # If error will catch the screenshot to help check the issue
