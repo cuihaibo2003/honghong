@@ -2,11 +2,12 @@ import os
 import pytest
 import allure
 from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect
 
 @pytest.fixture(scope="session")
 def browser_context():
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=False,slow_mo=1000)
         context = browser.new_context()
         context.grant_permissions(["geolocation"], origin="https://me-dev-1.snapsendsolve.com")
         yield browser, context  
@@ -101,15 +102,19 @@ def test_open_website(browser_context):
     
             page.locator("input[name='firstName']").fill("test")
             page.locator("input[name='lastName']").fill("test")
-            page.locator("input[name='email']").fill("haibo.cui@snapsendsolve.com")
+            page.locator("input[name='email']").fill("haibo.cui+123@snapsendsolve.com")
+            
             page.get_by_role("button", name="Next").click()
             
         with allure.step("Confirm details screen"):   
             
             confirm_title = page.locator(".snapper__main-title").inner_text()
             assert confirm_title == "Confirm details", f"Title mismatch: {confirm_title}"
-    
-            page.locator("button", has_text="Send").click()
+            
+            send_button = page.locator("button", has_text="Send")    
+            expect(send_button).to_be_visible(timeout=10000)
+            expect(send_button).to_be_enabled(timeout=10000)
+            send_button.click()
             
         with allure.step(f"Send screen"):
             # check url
