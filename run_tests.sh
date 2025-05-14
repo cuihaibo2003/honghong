@@ -6,6 +6,7 @@ clean_allure_cache() {
     fi
 }
 
+export PYTHONPATH=$(pwd)
 if [ "$1" == "admin" ]; then
     echo "Running pytest for admin portal"
     clean_allure_cache "admin_portal/testresult/allure-results"

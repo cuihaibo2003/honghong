@@ -3,9 +3,11 @@ import pytest
 import allure
 from playwright.sync_api import sync_playwright
 from playwright.sync_api import expect
+from snapper_portal.utils.portal_config import set_email_verification
 
 
 def test_open_website(browser_context):
+    set_email_verification(False)
     browser, context = browser_context  # return browser and context from  fixture 
     page = None  
     try:

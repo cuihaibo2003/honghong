@@ -1,3 +1,17 @@
 localtest/
 .venv/
 .pytest_cache/
+# Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+admin_portal
+# Environment files
+.env
+token.json
+
+# Gmail authorization files
+snapper_portal/utils/.env
+snapper_portal/utils/__pycache__/
+# Credentials
+snapper_portal/config/credentials.json
