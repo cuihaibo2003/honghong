@@ -126,7 +126,37 @@ def test_open_website(browser_context):
             
 
             # Fill out the verification code on the "One last step screen"
-        with allure.step("Fill in the verification code"):
+            
+        with allure.step("Fill in the incorrect verification code"):
+            # Find the input fields on the page
+            input_elements = page.locator('.code-input-container input')
+
+            # Get the number of the input fields on the page
+            input_elements_count = input_elements.count()
+
+            # Fill out the fields with '0' (incorrect verification code)
+            for i in range(input_elements_count): 
+                input_element = input_elements.nth(i)  # Get the i-th input element
+                input_element.click()
+                input_element.type('0')  # Fill '0' in each input field
+            
+            # Locate the error message
+            error_message_locator = page.locator(".code-error-tips")  # Adjust this locator to match the actual error message
+            
+      
+            # Check if the error message appears
+            error_message_locator.wait_for(state="visible", timeout=5000)  # Wait for the error message to be visible within 5 seconds
+            # Assert that the error message text matches the expected one
+            assert error_message_locator.inner_text() == "Invalid code, please try again.", "Error message text is incorrect"
+            
+            # Optionally, check if the error icon exists (if you want to validate the presence of the icon)
+            error_icon_locator = page.locator(".code-error-tips img[src='/images/4codeError.svg']")
+            assert error_icon_locator.is_visible(), "Error icon is not visible"
+            
+            print("Error message and icon are displayed correctly.")
+      
+            
+        with allure.step("Fill in the correct verification code"):
             # Find the input fields on the page
             input_elements = page.locator('.code-input-container input')
 
@@ -136,7 +166,8 @@ def test_open_website(browser_context):
             # fill out the number
             for i in range(input_elements_count): 
                 input_element = input_elements.nth(i)  # get the first input element
-                input_element.fill(verification_code[i])  # fill out the first input
+                input_element.click()
+                input_element.type(verification_code[i])  # fill out the first input
 
     except Exception as e:
         # If error will catch the screenshot to help check the issue
