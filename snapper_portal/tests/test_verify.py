@@ -61,7 +61,7 @@ def test_open_website(browser_context):
             next_button.click()
 
         # Wait for the “Incident location” screen loaded
-        with allure.step("Incident location page"):
+        with allure.step("Load the Incident location page"):
             page.wait_for_load_state('load')
             page.wait_for_selector('text=Incident location', timeout=10000)
             page.on('dialog', lambda dialog: dialog.accept())  
@@ -73,7 +73,7 @@ def test_open_website(browser_context):
         )
 
         # Fill out a new locatoin
-        with allure.step("Incident location page2"):
+        with allure.step("Fill out the incident location"):
             page.get_by_placeholder("Search address").click()
             page.get_by_placeholder("Search address").fill("570 church")
             page.get_by_text("570 Church StreetCremorne VIC, Australia").click()
@@ -89,7 +89,7 @@ def test_open_website(browser_context):
             assert Details_placeholder == expected_placeholder, f"Details placeholder text is incorrect. Found: {Details_placeholder}, Expected: {expected_placeholder}"     
             
             page.locator(".snapper-details__textarea").click()
-            page.locator(".snapper-details__textarea").fill("test")
+            page.locator(".snapper-details__textarea").fill("test the verification code")
             page.get_by_role("button", name="Next").click()
             
             
@@ -113,7 +113,7 @@ def test_open_website(browser_context):
             next_button.click()
             
         with allure.step("One last step screen"):
-            # check url
+            # Get the verification code and the session value
             page.wait_for_load_state("networkidle")
             locator = page.locator("text=Verify your email address")
             locator.first.wait_for(state="visible", timeout=10000)
@@ -121,7 +121,22 @@ def test_open_website(browser_context):
             time.sleep(5)
             verification_code = get_verification_code() 
             print(f"Extracted Verification Code: {verification_code}")
+            session_value = page.evaluate("() => sessionStorage.getItem('EVuuid')")
+            print(f"SessionStorage uuid value: {session_value}")
             
+
+            # Fill out the verification code on the "One last step screen"
+        with allure.step("Fill in the verification code"):
+            # Find the input fields on the page
+            input_elements = page.locator('.code-input-container input')
+
+            # get the number of the input fields on the page
+            input_elements_count = input_elements.count()
+
+            # fill out the number
+            for i in range(input_elements_count): 
+                input_element = input_elements.nth(i)  # get the first input element
+                input_element.fill(verification_code[i])  # fill out the first input
 
     except Exception as e:
         # If error will catch the screenshot to help check the issue
